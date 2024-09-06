@@ -1,0 +1,2 @@
+A webpage that will take the name of a city in the search bar and when Get Weather is selected it will display current weather data in the city. Can be viewed here: https://jessesim.github.io/weather-app/.
+Note: As of now sometimes the data will take a while to load, in this case it will thrown an error saying it failed to fetch data. Wait a few seconds and press Get Weather again. You may have to do this a couple of times before the data will show.
