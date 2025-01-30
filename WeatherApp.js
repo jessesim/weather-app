@@ -19,13 +19,14 @@ document.getElementById('getWeather').addEventListener('click', async () => {
       alert('Failed to get coordinates');
     }
     loadingMessage.textContent = ''; // Clear loading message after processing
+    button.disabled = false; // Disable button during request
   } else {
     alert('Please enter a valid city name');
     loadingMessage.textContent = ''; // Clear message if no city is entered
   }
 });
 
-async function getCoordinates(city, retries = 30, delay = 2000) {
+async function getCoordinates(city, retries = 10, delay = 2000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Fetch coordinates from geocode API
@@ -48,12 +49,12 @@ async function getCoordinates(city, retries = 30, delay = 2000) {
   return null; // Return null if all attempts fail
 }
 
-async function getWeather(lat, lon, retries = 20, delay = 2000) {
+async function getWeather(lat, lon, retries = 5, delay = 1000) {
   const loadingMessage = document.getElementById('loading-message');
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Fetch weather data using the provided coordinates
-      const response = await fetch(`https://api.open-meteo.com/v1/forecast?current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,apparent_temperature,precipitation_probability`); //https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`); //https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       // Parse the response as JSON
