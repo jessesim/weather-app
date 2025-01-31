@@ -26,7 +26,7 @@ document.getElementById('getWeather').addEventListener('click', async () => {
   }
 });
 
-async function getCoordinates(city, retries = 10, delay = 2000) {
+async function getCoordinates(city, retries = 10, delay = 1250) { //API throttled at 1 req per second
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Fetch coordinates from geocode API
@@ -38,6 +38,9 @@ async function getCoordinates(city, retries = 10, delay = 2000) {
       console.log('Geocode API response:', data); // Log response for debugging
 
       // Check if latitude and longitude are present
+      if (isNaN(parseFloat(data.latt))) {
+        throw new Error('Throttled or not found!');
+      }
       if (data.latt && data.longt) {
         return { lat: parseFloat(data.latt), lon: parseFloat(data.longt) };
       }
@@ -49,12 +52,12 @@ async function getCoordinates(city, retries = 10, delay = 2000) {
   return null; // Return null if all attempts fail
 }
 
-async function getWeather(lat, lon, retries = 5, delay = 1000) {
+async function getWeather(lat, lon, retries = 1, delay = 1000) {
   const loadingMessage = document.getElementById('loading-message');
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Fetch weather data using the provided coordinates
-      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`); //https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       // Parse the response as JSON
