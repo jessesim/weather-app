@@ -46,6 +46,7 @@ async function getCoordinates(city, retries = 10, delay = 1250) { //API throttle
       if (data.latt && data.longt) {
         return { lat: parseFloat(data.latt), lon: parseFloat(data.longt) };
       }
+      
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`, error); // Log failed attempt
       if (attempt < retries) await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
@@ -64,18 +65,14 @@ async function getWeather(lat, lon, retries = 1, delay = 1000) {
 
       // Parse the response as JSON
       const data = await response.json();
-/*
-      displayWeather(data);
-      loadingMessage.textContent = ''; // Clear loading message on success
-      return;
-*/
+
       // Check if current weather data is available
       if (data.current) {
         displayWeather(data);
         loadingMessage.textContent = ''; // Clear loading message on success
         return;
       }
-      
+
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`, error); // Log failed attempt
       if (attempt < retries) await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
