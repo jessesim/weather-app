@@ -59,19 +59,23 @@ async function getWeather(lat, lon, retries = 1, delay = 1000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Fetch weather data using the provided coordinates
-      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,wind_speed_10m,wind_direction_10m`); //https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`); 
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      
       // Parse the response as JSON
       const data = await response.json();
-
+/*
+      displayWeather(data);
+      loadingMessage.textContent = ''; // Clear loading message on success
+      return;
+*/
       // Check if current weather data is available
-      if (data.current_weather) {
+      if (data.current) {
         displayWeather(data);
         loadingMessage.textContent = ''; // Clear loading message on success
         return;
       }
+      
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`, error); // Log failed attempt
       if (attempt < retries) await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
@@ -85,8 +89,13 @@ function displayWeather(data) {
   const weatherDiv = document.getElementById('weather');
   weatherDiv.innerHTML = `
     <h2>Weather Data</h2>
-    <p>Temperature: ${data.current_weather.temperature.toFixed(1)}°C / ${(data.current_weather.temperature * 9/5 + 32).toFixed(1)}°F</p>
-    <p>Wind Speed: ${data.current_weather.windspeed.toFixed(1)} km/h / ${(data.current_weather.windspeed * 0.621371).toFixed(1)} mph</p>
-    <p>Wind Direction: ${data.current_weather.winddirection}°</p>
+    <p>Temperature: ${data.current.temperature_2m}°F</p>
+    <p>Apparent Temperature: ${data.current.apparent_temperature}°F</p>
+    <p>Precipitation: ${data.current.precipitation} inches</p>
+    <p>Relative Humidity: ${data.current.relative_humidity_2m}</p>
+    <p>Wind Speed: ${data.current.wind_speed_10m} mph</p>
+    <p>Wind Direction: ${data.current.wind_direction_10m}°</p>
+    <p>Weather Code: ${data.current.weather_code}</p>
+
   `;
 }
